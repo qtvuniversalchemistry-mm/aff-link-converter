@@ -6,10 +6,10 @@
   <title>MAINN Media – Lấy link ưu đãi Shopee & TikTok</title>
   <meta name="description" content="Công cụ của MAINN Media: dán link sản phẩm Shopee hoặc TikTok Shop để nhận link mua hàng ưu đãi." />
   <meta property="og:title" content="MAINN Media – Lấy link ưu đãi Shopee & TikTok" />
-  <meta property="og:image" content="/assets/og-image.png" />
+  <meta property="og:image" content="https://qtvuniversalchemistry-mm.github.io/aff-link-converter/assets/og-image.png" />
   <meta name="theme-color" content="#0099e5" />
-  <link rel="icon" type="image/png" href="/assets/icon.png" />
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="assets/icon.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
   <style>
     /* ============ MÀU THƯƠNG HIỆU MAINN MEDIA ============
        Lấy theo logo: chữ M chuyển từ xanh ngọc #00F1A7 sang xanh dương #00A1DF,
@@ -168,7 +168,7 @@
   <main>
     <header>
       <a class="brand" href="https://mainnmedia.com" target="_blank" rel="noopener" aria-label="MAINN Media">
-        <img src="/assets/logo.png" alt="MAINN Media" width="557" height="144" onerror="this.hidden=true;this.nextElementSibling.hidden=false" />
+        <img src="assets/logo.png" alt="MAINN Media" width="557" height="144" onerror="this.hidden=true;this.nextElementSibling.hidden=false" />
         <span class="wordmark" hidden>MAINN <span>Media</span></span>
       </a>
       <h1>Lấy link ưu đãi Shopee &amp; TikTok</h1>
@@ -207,7 +207,9 @@
 
   <div class="toast" id="toast" role="status"></div>
 
-  <script>
+  <script type="module">
+    import config from "./config.js";
+    import { convertInBrowser } from "./lib/web.js";
     (function () {
       var form = document.getElementById("form");
       var input = document.getElementById("url");
@@ -298,14 +300,9 @@
         var value = input.value.trim();
         if (!value || busy) return;
         setBusy(true);
-        fetch("/api/convert", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: value })
-        })
-          .then(function (r) { return r.json().catch(function () { return { ok: false, message: "Máy chủ đang bận, vui lòng thử lại." }; }); })
+        convertInBrowser(value, config)
           .then(showResult)
-          .catch(function () { showResult({ ok: false, message: "Mất kết nối mạng, vui lòng thử lại." }); })
+          .catch(function () { showResult({ ok: false, message: "Có lỗi xảy ra, vui lòng thử lại." }); })
           .then(function () { setBusy(false); });
       }
 

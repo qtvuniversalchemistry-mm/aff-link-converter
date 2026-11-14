@@ -1,6 +1,6 @@
 // =====================================================================
 //  CẤU HÌNH CỦA BẠN — CHỈ CẦN SỬA FILE NÀY
-//  Sửa xong bấm "Commit changes" trên GitHub, Vercel tự cập nhật sau ~1 phút.
+//  Sửa xong bấm "Commit changes" trên GitHub, GitHub Pages tự cập nhật sau 1–2 phút.
 //  Lưu ý: giữ nguyên dấu nháy "..." và dấu phẩy cuối dòng.
 // =====================================================================
 
@@ -34,4 +34,10 @@ export default {
   // Ví dụ: "https://zalo.me/0912345678" hoặc link fanpage. Để trống để ẩn nút.
   contactUrl: "",
   contactLabel: "Nhắn mình để lấy link",
+
+  // ----- BỘ MỞ LINK RÚT GỌN (s.shopee.vn, vt.tiktok.com...) -----
+  // GitHub Pages không tự mở được link rút gọn. Dán địa chỉ Cloudflare Worker vào đây
+  // (cách tạo: README.md, mục "Bật đọc link rút gọn"), ví dụ "https://mainn-link.ten-ban.workers.dev".
+  // Để trống: web vẫn đổi được link đầy đủ, link rút gọn sẽ hiện hướng dẫn cho khách.
+  resolverUrl: "",
 };
