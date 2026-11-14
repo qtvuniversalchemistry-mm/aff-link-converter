@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Lấy Link Ưu Đãi Shopee & TikTok</title>
+  <meta name="description" content="Dán link sản phẩm Shopee hoặc TikTok Shop để nhận link mua hàng ưu đãi." />
+  <meta name="theme-color" content="#ee4d2d" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛍️</text></svg>" />
+  <style>
+    :root {
+      --bg: #f6f6f8;
+      --card: #ffffff;
+      --text: #1d1d22;
+      --muted: #6b6b76;
+      --border: #e3e3ea;
+      --brand: #ee4d2d;
+      --brand-ink: #ffffff;
+      --brand-soft: #fff1ed;
+      --ok: #12805c;
+      --ok-soft: #e8f6f0;
+      --err: #b42318;
+      --err-soft: #fdecea;
+      --radius: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111114;
+        --card: #1b1b20;
+        --text: #f1f1f4;
+        --muted: #a0a0ab;
+        --border: #2d2d35;
+        --brand: #ff6a45;
+        --brand-ink: #1a0a05;
+        --brand-soft: #2a1914;
+        --ok: #4ad19a;
+        --ok-soft: #11261d;
+        --err: #ff8a80;
+        --err-soft: #2b1514;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    main { max-width: 560px; margin: 0 auto; padding: 28px 16px 40px; }
+    header { text-align: center; margin-bottom: 20px; }
+    h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+    .sub { color: var(--muted); margin: 0; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    label { display: block; font-weight: 600; margin-bottom: 8px; }
+    .input-row { position: relative; }
+    textarea {
+      width: 100%;
+      min-height: 92px;
+      resize: vertical;
+      padding: 12px 84px 12px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      font-size: 16px; /* tránh iPhone tự zoom */
+      word-break: break-all;
+    }
+    textarea:focus { outline: none; border-color: var(--brand); }
+    .paste-btn {
+      position: absolute; top: 8px; right: 8px;
+      border: 1px solid var(--border); background: var(--card); color: var(--text);
+      border-radius: 8px; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; min-height: 48px; margin-top: 12px;
+      border: 0; border-radius: 10px; cursor: pointer;
+      background: var(--brand); color: var(--brand-ink);
+      font: inherit; font-weight: 700; font-size: 1.05rem;
+      text-decoration: none;
+    }
+    .btn:disabled { opacity: .6; cursor: wait; }
+    .btn.secondary { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-row .btn { margin-top: 12px; }
+    .spinner {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2.5px solid currentColor; border-right-color: transparent;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #result { display: none; }
+    #result.show { display: block; }
+    .result-ok { border-color: var(--ok); background: var(--ok-soft); }
+    .result-err { border-color: var(--err); background: var(--err-soft); }
+    .result-title { font-weight: 700; margin: 0 0 8px; }
+    .result-ok .result-title { color: var(--ok); }
+    .result-err .result-title { color: var(--err); }
+    .badge {
+      display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .02em;
+      padding: 2px 8px; border-radius: 999px; margin-left: 6px; vertical-align: 2px;
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+    }
+    .link-box {
+      background: var(--card); border: 1px dashed var(--border); border-radius: 8px;
+      padding: 10px 12px; font-size: 14px; word-break: break-all; color: var(--muted);
+      max-height: 96px; overflow: auto;
+    }
+    .steps { margin: 0; padding-left: 20px; color: var(--muted); }
+    .steps li { margin-bottom: 4px; }
+    .steps b { color: var(--text); }
+    .history h2 { font-size: 1rem; margin: 0 0 8px; }
+    .history ul { list-style: none; margin: 0; padding: 0; }
+    .history li {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 0; border-top: 1px solid var(--border); font-size: 14px;
+    }
+    .history li:first-child { border-top: 0; }
+    .history .h-id { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .history button {
+      flex: none; border: 1px solid var(--border); background: var(--card); color: var(--text);
+      border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer;
+    }
+    footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 24px; }
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+      background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px;
+      font-size: 14px; font-weight: 600; opacity: 0; pointer-events: none;
+      transition: opacity .2s, transform .2s;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Lấy link ưu đãi Shopee &amp; TikTok</h1>
+      <p class="sub">Dán link sản phẩm bạn muốn mua, nhận lại link mua hàng ngay.</p>
+    </header>
+
+    <form class="card" id="form" autocomplete="off">
+      <label for="url">Link sản phẩm</label>
+      <div class="input-row">
+        <textarea id="url" name="url" inputmode="url" placeholder="Ví dụ: https://s.shopee.vn/... hoặc https://vt.tiktok.com/..." required></textarea>
+        <button type="button" class="paste-btn" id="pasteBtn">Dán</button>
+      </div>
+      <button type="submit" class="btn" id="submitBtn">Lấy link ưu đãi</button>
+    </form>
+
+    <section class="card" id="result" aria-live="polite"></section>
+
+    <section class="card">
+      <ol class="steps">
+        <li>Mở sản phẩm trên app <b>Shopee</b> hoặc <b>TikTok</b>, bấm <b>Chia sẻ → Sao chép liên kết</b>.</li>
+        <li>Dán vào ô bên trên, bấm <b>Lấy link ưu đãi</b>.</li>
+        <li>Bấm <b>Mở ngay</b> để vào đúng sản phẩm và đặt hàng như bình thường.</li>
+      </ol>
+    </section>
+
+    <section class="card history" id="history" hidden>
+      <h2>Link gần đây</h2>
+      <ul id="historyList"></ul>
+    </section>
+
+    <footer>
+      Link được tạo có chứa mã tiếp thị liên kết. Bạn mua với giá như bình thường, không mất thêm phí.
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (function () {
+      var form = document.getElementById("form");
+      var input = document.getElementById("url");
+      var submitBtn = document.getElementById("submitBtn");
+      var pasteBtn = document.getElementById("pasteBtn");
+      var resultEl = document.getElementById("result");
+      var historyEl = document.getElementById("history");
+      var historyList = document.getElementById("historyList");
+      var toastEl = document.getElementById("toast");
+      var HISTORY_KEY = "aff_history_v1";
+      var PLATFORM_NAME = { shopee: "Shopee", tiktok: "TikTok Shop" };
+      var busy = false;
+
+      function el(tag, attrs, children) {
+        var node = document.createElement(tag);
+        if (attrs) Object.keys(attrs).forEach(function (k) {
+          if (k === "text") node.textContent = attrs[k];
+          else if (k === "class") node.className = attrs[k];
+          else node.setAttribute(k, attrs[k]);
+        });
+        (children || []).forEach(function (c) { if (c) node.appendChild(c); });
+        return node;
+      }
+
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+      }
+
+      function copy(text) {
+        function fallback() {
+          var ta = document.createElement("textarea");
+          ta.value = text; ta.setAttribute("readonly", "");
+          ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.select();
+          try { document.execCommand("copy"); toast("Đã sao chép link"); }
+          catch (e) { toast("Không sao chép được, hãy giữ để copy"); }
+          document.body.removeChild(ta);
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(function () { toast("Đã sao chép link"); }, fallback);
+        } else fallback();
+      }
+
+      function setBusy(on) {
+        busy = on;
+        submitBtn.disabled = on;
+        submitBtn.textContent = "";
+        if (on) {
+          submitBtn.appendChild(el("span", { class: "spinner", "aria-hidden": "true" }));
+          submitBtn.appendChild(document.createTextNode("Đang xử lý..."));
+        } else {
+          submitBtn.textContent = "Lấy link ưu đãi";
+        }
+      }
+
+      function showResult(data) {
+        resultEl.textContent = "";
+        resultEl.className = "card show " + (data.ok ? "result-ok" : "result-err");
+
+        if (data.ok) {
+          var title = el("p", { class: "result-title", text: "Link của bạn đã sẵn sàng" }, [
+            el("span", { class: "badge", text: PLATFORM_NAME[data.platform] || data.platform })
+          ]);
+          var box = el("div", { class: "link-box", text: data.affiliateLink });
+          var copyBtn = el("button", { type: "button", class: "btn secondary", text: "Sao chép" });
+          copyBtn.addEventListener("click", function () { copy(data.affiliateLink); });
+          var openBtn = el("a", { class: "btn", href: data.affiliateLink, target: "_blank", rel: "noopener", text: "Mở ngay" });
+          resultEl.appendChild(title);
+          resultEl.appendChild(box);
+          resultEl.appendChild(el("div", { class: "btn-row" }, [copyBtn, openBtn]));
+          saveHistory(data);
+        } else {
+          resultEl.appendChild(el("p", { class: "result-title", text: data.message || "Không xử lý được link này." }));
+          if (data.code === "TIKTOK_NOT_LISTED") {
+            resultEl.appendChild(el("p", { text: "Bạn vẫn có thể mua bằng link gốc, hoặc nhắn mình để được gửi link ưu đãi." }));
+          }
+          if (data.contactUrl) {
+            resultEl.appendChild(el("a", { class: "btn", href: data.contactUrl, target: "_blank", rel: "noopener", text: data.contactLabel || "Liên hệ" }));
+          }
+        }
+        resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function convert() {
+        var value = input.value.trim();
+        if (!value || busy) return;
+        setBusy(true);
+        fetch("/api/convert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url: value })
+        })
+          .then(function (r) { return r.json().catch(function () { return { ok: false, message: "Máy chủ đang bận, vui lòng thử lại." }; }); })
+          .then(showResult)
+          .catch(function () { showResult({ ok: false, message: "Mất kết nối mạng, vui lòng thử lại." }); })
+          .then(function () { setBusy(false); });
+      }
+
+      // ----- Lịch sử (chỉ lưu trên máy người dùng) -----
+      function loadHistory() {
+        try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch (e) { return []; }
+      }
+      function saveHistory(data) {
+        var list = loadHistory().filter(function (h) { return h.link !== data.affiliateLink; });
+        list.unshift({ platform: data.platform, id: data.productId, link: data.affiliateLink });
+        list = list.slice(0, 5);
+        try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
+        renderHistory();
+      }
+      function renderHistory() {
+        var list = loadHistory();
+        historyList.textContent = "";
+        historyEl.hidden = list.length === 0;
+        list.forEach(function (h) {
+          var btn = el("button", { type: "button", text: "Sao chép" });
+          btn.addEventListener("click", function () { copy(h.link); });
+          historyList.appendChild(el("li", null, [
+            el("span", { class: "h-id", text: (PLATFORM_NAME[h.platform] || "") + " · " + h.id }),
+            btn
+          ]));
+        });
+      }
+
+      // ----- Sự kiện -----
+      form.addEventListener("submit", function (e) { e.preventDefault(); convert(); });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); convert(); }
+      });
+      input.addEventListener("paste", function () {
+        setTimeout(function () { if (/https?:\/\/|shopee|tiktok/i.test(input.value)) convert(); }, 50);
+      });
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        pasteBtn.addEventListener("click", function () {
+          navigator.clipboard.readText().then(function (t) {
+            if (t) { input.value = t; convert(); }
+          }, function () { input.focus(); toast("Hãy giữ vào ô trống và chọn Dán"); });
+        });
+      } else {
+        pasteBtn.hidden = true;
+      }
+
+      // Hỗ trợ mở sẵn: trang?url=LINK
+      try {
+        var preset = new URLSearchParams(location.search).get("url");
+        if (preset) { input.value = preset; convert(); }
+      } catch (e) {}
+
+      renderHistory();
+    })();
+  </script>
+</body>
+</html>
