@@ -9,7 +9,7 @@ export default {
   shopee: {
     // Affiliate ID của bạn (dãy số, thường bắt đầu bằng 17...).
     // Cách lấy: xem README.md, mục "Lấy Shopee Affiliate ID".
-    affiliateId: "",
+    affiliateId: "17322860354",
 
     // Sub ID (tùy chọn) để lọc trong báo cáo Shopee Affiliate, ví dụ "webtool".
     // Chỉ dùng chữ không dấu, số, dấu gạch dưới. Để trống nếu không cần.
