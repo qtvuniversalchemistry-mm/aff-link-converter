@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>MAINN Media – Lấy link ưu đãi Shopee & TikTok</title>
-  <meta name="description" content="Công cụ của MAINN Media: dán link sản phẩm Shopee hoặc TikTok Shop để nhận link mua hàng ưu đãi." />
-  <meta property="og:title" content="MAINN Media – Lấy link ưu đãi Shopee & TikTok" />
+  <title>MAINN Media – Lấy link ưu đãi Shopee</title>
+  <meta name="description" content="Công cụ của MAINN Media: dán link sản phẩm Shopee để nhận link mua hàng ưu đãi." />
+  <meta property="og:title" content="MAINN Media – Lấy link ưu đãi Shopee" />
   <meta property="og:image" content="https://qtvuniversalchemistry-mm.github.io/aff-link-converter/assets/og-image.png" />
   <meta name="theme-color" content="#0099e5" />
   <link rel="icon" type="image/png" href="assets/icon.png" />
@@ -171,14 +171,14 @@
         <img src="assets/logo.png" alt="MAINN Media" width="557" height="144" onerror="this.hidden=true;this.nextElementSibling.hidden=false" />
         <span class="wordmark" hidden>MAINN <span>Media</span></span>
       </a>
-      <h1>Lấy link ưu đãi Shopee &amp; TikTok</h1>
+      <h1>Lấy link ưu đãi Shopee<span class="tt-only" hidden> &amp; TikTok</span></h1>
       <p class="sub">Dán link sản phẩm bạn muốn mua, nhận lại link mua hàng ngay.</p>
     </header>
 
     <form class="card" id="form" autocomplete="off">
       <label for="url">Link sản phẩm</label>
       <div class="input-row">
-        <textarea id="url" name="url" inputmode="url" placeholder="Ví dụ: https://s.shopee.vn/... hoặc https://vt.tiktok.com/..." required></textarea>
+        <textarea id="url" name="url" inputmode="url" placeholder="Ví dụ: https://s.shopee.vn/..." required></textarea>
         <button type="button" class="paste-btn" id="pasteBtn">Dán</button>
       </div>
       <button type="submit" class="btn" id="submitBtn">Lấy link ưu đãi</button>
@@ -188,7 +188,7 @@
 
     <section class="card">
       <ol class="steps">
-        <li>Mở sản phẩm trên app <b>Shopee</b> hoặc <b>TikTok</b>, bấm <b>Chia sẻ → Sao chép liên kết</b>.</li>
+        <li>Mở sản phẩm trên app <b>Shopee</b><span class="tt-only" hidden> hoặc <b>TikTok</b></span>, bấm <b>Chia sẻ → Sao chép liên kết</b>.</li>
         <li>Dán vào ô bên trên, bấm <b>Lấy link ưu đãi</b>.</li>
         <li>Bấm <b>Mở ngay</b> để vào đúng sản phẩm và đặt hàng như bình thường.</li>
       </ol>
@@ -211,6 +211,12 @@
     import config from "./config.js";
     import { convertInBrowser } from "./lib/web.js";
     (function () {
+      // TikTok đang tắt trong config.js thì ẩn mọi chữ "TikTok" trên trang
+      if (config.enableTiktok !== false) {
+        document.querySelectorAll(".tt-only").forEach(function (n) { n.hidden = false; });
+        var ta = document.getElementById("url");
+        ta.placeholder = "Ví dụ: https://s.shopee.vn/... hoặc https://vt.tiktok.com/...";
+      }
       var form = document.getElementById("form");
       var input = document.getElementById("url");
       var submitBtn = document.getElementById("submitBtn");

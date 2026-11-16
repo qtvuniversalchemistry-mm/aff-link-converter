@@ -86,3 +86,14 @@ test("Worker: từ chối domain lạ và chuyển hướng ra domain lạ", asy
   });
   assert.equal(r.status, 400);
 });
+
+test("Tắt TikTok (enableTiktok: false): link TikTok bị từ chối, Shopee vẫn chạy", async () => {
+  const c = { ...cfg, enableTiktok: false };
+  const t = await convertInBrowser("https://shop.tiktok.com/view/product/1729384756473829", c, mustNotFetch);
+  assert.equal(t.ok, false);
+  assert.equal(t.message, "Hiện chỉ hỗ trợ link sản phẩm Shopee.");
+  const t2 = await convertInBrowser("https://vt.tiktok.com/ZS1/", { ...c, resolverUrl: "https://r.dev" }, mustNotFetch);
+  assert.equal(t2.message, "Hiện chỉ hỗ trợ link sản phẩm Shopee.");
+  const s = await convertInBrowser("https://shopee.vn/Ao-i.1.2", c, mustNotFetch);
+  assert.equal(s.ok, true);
+});

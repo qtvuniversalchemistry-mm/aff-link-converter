@@ -16,6 +16,11 @@ export default {
     subId: "webtool",
   },
 
+  // ----- TIKTOK SHOP: BẬT / TẮT -----
+  // false = tạm tắt: web chỉ nhận link Shopee, link TikTok sẽ báo "chỉ hỗ trợ Shopee".
+  // true  = bật lại TikTok (dùng danh sách link ở mục products bên dưới).
+  enableTiktok: false,
+
   // ----- LINK AFFILIATE CÓ SẴN (dùng cho TikTok Shop, hoặc ghi đè Shopee) -----
   // TikTok Shop không cho tự ghép mã affiliate vào link,
   // nên bạn tạo link affiliate trong TikTok Shop Affiliate rồi dán vào đây.

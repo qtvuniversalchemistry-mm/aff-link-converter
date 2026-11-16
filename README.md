@@ -61,6 +61,8 @@ GitHub Pages chỉ chứa trang tĩnh nên **không tự mở được link rút
 
 ## Thêm sản phẩm TikTok Shop
 
+> **Đang tạm tắt TikTok** (`enableTiktok: false` trong `config.js`): web chỉ nhận link Shopee. Muốn bật lại, đổi thành `enableTiktok: true` rồi Commit.
+
 1. Trong TikTok Shop Affiliate (app TikTok hoặc trang creator), tạo link affiliate cho sản phẩm → được link dạng `https://vt.tiktok.com/ZS.../`.
 2. Lấy mã sản phẩm: mở link sản phẩm gốc, dãy số dài sau `/product/` (ví dụ `1729384756473829`).
 3. Sửa `config.js`, thêm 1 dòng vào phần `products`:
