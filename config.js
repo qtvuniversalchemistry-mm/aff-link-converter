@@ -39,5 +39,5 @@ export default {
   // GitHub Pages không tự mở được link rút gọn. Dán địa chỉ Cloudflare Worker vào đây
   // (cách tạo: README.md, mục "Bật đọc link rút gọn"), ví dụ "https://mainn-link.ten-ban.workers.dev".
   // Để trống: web vẫn đổi được link đầy đủ, link rút gọn sẽ hiện hướng dẫn cho khách.
-  resolverUrl: "",
+  resolverUrl: "https://mainn-link.qtv-universalchemistry.workers.dev/",
 };
