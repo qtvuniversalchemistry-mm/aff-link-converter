@@ -47,6 +47,20 @@ GitHub Pages chỉ chứa trang tĩnh nên **không tự mở được link rút
 4. Sao chép địa chỉ Worker (dạng `https://mainn-link.ten-ban.workers.dev`) và dán vào `resolverUrl` trong `config.js` → Commit.
 5. Kiểm tra: dán 1 link `s.shopee.vn/...` vào web tool → phải ra link ưu đãi của đúng sản phẩm.
 
+### Bước 3c — Trả link rút gọn `s.shopee.vn/...` (cần Shopee Affiliate Open API)
+
+Mặc định web trả link dài dạng `s.shopee.vn/an_redir?...`. Muốn ra link ngắn như nút **Lấy link** trong *Custom Link* của Shopee Affiliate (ví dụ `https://s.shopee.vn/6q2JfuBqIE`), Worker cần khóa Open API của tài khoản affiliate:
+
+1. Đăng nhập **affiliate.shopee.vn** → tìm mục **Open API** → đăng ký/lấy **AppID** và **Secret**. (Tài khoản cần được Shopee cấp quyền Open API; nếu không thấy mục này, liên hệ Shopee Affiliate.)
+2. Cloudflare → Worker `mainn-link` → **Settings** → **Variables and Secrets** → **Add**:
+   - Tên `SHOPEE_APP_ID`, kiểu **Secret**, giá trị = AppID.
+   - Tên `SHOPEE_SECRET`, kiểu **Secret**, giá trị = Secret.
+   → **Deploy/Save**.
+3. **Edit code**, dán lại toàn bộ file `worker/short-link-resolver.js` bản mới → **Deploy**.
+4. Kiểm tra: dán link Shopee vào web → kết quả phải là `https://s.shopee.vn/` + chuỗi ngắn, bấm **Mở ngay** ra đúng sản phẩm.
+
+**Không** dán AppID/Secret vào `config.js` hay bất kỳ file nào trên GitHub (repo công khai). Chưa cài khóa hoặc Shopee lỗi thì web tự dùng link dài, khách vẫn mua được.
+
 > Giao diện Cloudflare có thể khác mô tả; gửi ảnh chụp nếu không thấy đúng nút. Worker này chỉ mở link Shopee/TikTok, không chứa mã affiliate, không lưu link.
 
 ### Bước 4 — KIỂM TRA BẮT BUỘC trước khi chia sẻ cho khách

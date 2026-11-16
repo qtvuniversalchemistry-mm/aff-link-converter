@@ -27,7 +27,7 @@ test("Trình duyệt: link rút gọn khi chưa cài resolverUrl -> hướng d�
 test("Trình duyệt: link rút gọn qua bộ mở link (url hoặc links trong trang)", async () => {
   const c = { ...cfg, resolverUrl: "https://r.example.workers.dev" };
   let called;
-  const f = async (u) => { called = u; return json({ ok: true, url: "https://shopee.vn/product/1/2", links: [] }); };
+  const f = async (u) => { called ??= u; return json({ ok: true, url: "https://shopee.vn/product/1/2", links: [] }); };
   const r = await convertInBrowser("Xem nè https://s.shopee.vn/abc", c, f);
   assert.equal(called, "https://r.example.workers.dev?url=" + encodeURIComponent("https://s.shopee.vn/abc"));
   assert.equal(r.ok, true);
@@ -47,7 +47,7 @@ test("Trình duyệt: bộ mở link lỗi mạng -> báo lỗi thân thiện", 
 });
 
 // ---- Cloudflare Worker ----
-async function callWorker(target, routes) {
+async function callWorker(target, routes, query = "url=" + encodeURIComponent(target), env) {
   const orig = globalThis.fetch;
   globalThis.fetch = async (href) => {
     const r = routes[href];
@@ -55,7 +55,7 @@ async function callWorker(target, routes) {
     return new Response(r.body ?? "", { status: r.status, headers: r.location ? { location: r.location } : {} });
   };
   try {
-    const res = await worker.fetch(new Request("https://w.dev/?url=" + encodeURIComponent(target)));
+    const res = await worker.fetch(new Request("https://w.dev/?" + query), env);
     return { status: res.status, cors: res.headers.get("access-control-allow-origin"), body: await res.json() };
   } finally {
     globalThis.fetch = orig;
@@ -96,4 +96,59 @@ test("Tắt TikTok (enableTiktok: false): link TikTok bị từ chối, Shopee v
   assert.equal(t2.message, "Hiện chỉ hỗ trợ link sản phẩm Shopee.");
   const s = await convertInBrowser("https://shopee.vn/Ao-i.1.2", c, mustNotFetch);
   assert.equal(s.ok, true);
+});
+
+test("Rút gọn: có link s.shopee.vn từ Worker -> hiện link rút gọn, giữ link dài dự phòng", async () => {
+  const c = { ...cfg, resolverUrl: "https://r.dev/" };
+  const calls = [];
+  const f = async (u) => { calls.push(u); return json({ ok: true, shortLink: "https://s.shopee.vn/6q2JfuBqIE" }); };
+  const r = await convertInBrowser("https://shopee.vn/Ao-i.1076210029.26762851379?extraParams=x", c, f);
+  assert.equal(r.ok, true);
+  assert.equal(r.affiliateLink, "https://s.shopee.vn/6q2JfuBqIE");
+  assert.match(r.longLink, /an_redir/);
+  assert.equal(calls[0], "https://r.dev/?shorten=" + encodeURIComponent("https://shopee.vn/product/1076210029/26762851379") + "&sub=webtool");
+});
+
+test("Rút gọn: Worker chưa cài khóa / lỗi mạng / trả link lạ -> giữ link dài", async () => {
+  const c = { ...cfg, resolverUrl: "https://r.dev/" };
+  for (const f of [
+    async () => json({ ok: false, error: "not_configured" }),
+    async () => { throw new Error("offline"); },
+    async () => json({ ok: true, shortLink: "https://evil.com/x" }),
+  ]) {
+    const r = await convertInBrowser("https://shopee.vn/Ao-i.1.2", c, f);
+    assert.equal(r.ok, true);
+    assert.match(r.affiliateLink, /an_redir/);
+  }
+});
+
+test("Worker rút gọn: ký đúng chuẩn Shopee Open API, trả shortLink", async () => {
+  const { createHash } = await import("node:crypto");
+  let sent;
+  const orig = globalThis.fetch;
+  globalThis.fetch = async (href, opts) => {
+    sent = { href, opts };
+    return new Response(JSON.stringify({ data: { generateShortLink: { shortLink: "https://s.shopee.vn/abcXYZ" } } }));
+  };
+  try {
+    const env = { SHOPEE_APP_ID: "123", SHOPEE_SECRET: "sec" };
+    const res = await worker.fetch(new Request("https://w.dev/?shorten=" + encodeURIComponent("https://shopee.vn/product/1/2") + "&sub=web_tool,x"), env);
+    const body = await res.json();
+    assert.equal(body.shortLink, "https://s.shopee.vn/abcXYZ");
+    assert.equal(sent.href, "https://open-api.affiliate.shopee.vn/graphql");
+    const payload = sent.opts.body;
+    assert.match(payload, /generateShortLink/);
+    assert.match(payload, /subIds:\[\\"webtool\\",\\"x\\"\]/);
+    const m = sent.opts.headers.Authorization.match(/^SHA256 Credential=123, Timestamp=(\d+), Signature=([0-9a-f]{64})$/);
+    assert.ok(m);
+    assert.equal(m[2], createHash("sha256").update("123" + m[1] + payload + "sec").digest("hex"));
+  } finally {
+    globalThis.fetch = orig;
+  }
+});
+
+test("Worker rút gọn: chưa có khóa / domain lạ", async () => {
+  const q = (u) => "shorten=" + encodeURIComponent(u);
+  assert.equal((await callWorker("", {}, q("https://shopee.vn/product/1/2"), {})).body.error, "not_configured");
+  assert.equal((await callWorker("", {}, q("https://evil.com/x"), { SHOPEE_APP_ID: "1", SHOPEE_SECRET: "2" })).status, 400);
 });

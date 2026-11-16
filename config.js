@@ -12,7 +12,7 @@ export default {
     affiliateId: "17322860354",
 
     // Sub ID (tùy chọn) để lọc trong báo cáo Shopee Affiliate, ví dụ "webtool".
-    // Chỉ dùng chữ không dấu, số, dấu gạch dưới. Để trống nếu không cần.
+    // Chỉ dùng chữ không dấu và số (a-z, A-Z, 0-9). Để trống nếu không cần.
     subId: "webtool",
   },
 
